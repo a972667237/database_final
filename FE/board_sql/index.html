@@ -1,0 +1,296 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>某汇总</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/master.css">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="vue-container" id="app">
+      <ul class="nav nav-tabs">
+        <li role="presentation" class="active"><a href="#">主页</a></li>
+        <li role="presentation"><a href="#">原版公文通</a></li>
+        <li role="presentation"><a href="#" data-toggle="modal" data-target="#choiceModal">想看的内容</a></li>
+      </ul>
+      <div class="container">
+        <div class="panel panel-default">
+          <!-- Default panel contents -->
+          <div class="panel-heading">置顶区域</div>
+          <div class="panel-body">
+            <p>emmm，置顶的总得看吧</p>
+          </div>
+          <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>标题</th>
+                  <th>单位</th>
+                  <th>原分类</th>
+                  <th>建议分类</th>
+                  <th>点击量</th>
+                  <th>点赞量</th>
+                </tr>
+              </thead>
+              <tr v-for="a in topAn" v-on:click="clickTr(a.content, a.title, a.id)" v-bind:id="'tr_' + a.id">
+                <td>{{ a.title }}</td>
+                <td>{{ a.unit }}</td>
+                <td>{{ a.oriType }}</td>
+                <td>{{ a.sType }}</td>
+                <td>{{ a.click }}</td>
+                <td>{{ a.approve }}</td>
+              </tr>
+          </table>
+      </div>
+
+      <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading">定制区域</div>
+        <div class="panel-body">
+          <p>自己定制的东西，往下看就行了</p>
+        </div>
+        <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>标题</th>
+                <th>单位</th>
+                <th>原分类</th>
+                <th>建议分类</th>
+                <th>点击量</th>
+                <th>点赞量</th>
+              </tr>
+            </thead>
+            <tr v-for="a in an" v-on:click="clickTr(a.content, a.title, a.id)" v-bind:id="'tr_' + a.id">
+              <td>{{ a.title }}</td>
+              <td>{{ a.unit }}</td>
+              <td>{{ a.oriType }}</td>
+              <td>{{ a.sType }}</td>
+              <td>{{ a.click }}</td>
+              <td>{{ a.approve }}</td>
+            </tr>
+        </table>
+    </div>
+      </div>
+
+      <!-- Modal -->
+      <div class="modal fade" id="content_modal" tabindex="-1" role="dialog" aria-labelledby="gridSystemModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="gridSystemModalLabel">{{ nowTitle }}</h4>
+            </div>
+            <div class="modal-body">
+              {{ nowContent }}
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" @click="pointApprove()"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+      </div><!-- /.modal -->
+
+      <div class="modal fade" id="choiceModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="myModalLabel">选择你想看的内容</h4>
+            </div>
+            <div class="modal-body">
+              <form class="form-inline">
+                <div class="form-group">
+                  <div class="checkbox" v-for="c in typeAndUnit.type">
+                    <label>
+                      <input type="checkbox" v-bind:value="c" v-model="checkedTypes">
+                      {{ c }}
+                    </label>
+                  </div>
+                </div>
+                <hr>
+                <div class="form-group">
+                  <div class="checkbox" v-for="c in typeAndUnit.unit">
+                    <label>
+                      <input type="checkbox" v-bind:value="c" v-model="checkedUnits">
+                      {{ c }}
+                    </label>
+                  </div>
+                </div>
+              </form>
+              <span>type:{{ checkedTypes }}</span>
+              <br>
+              <span>unit:{{ checkedUnits }}</span>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" @click="saveAndReload()">Save changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/vue.js" charset="utf-8"></script>
+    <script type="text/javascript">
+      var app2 = new Vue({
+        el: '#app',
+        data: {
+          checkedUnits: [],
+          checkedTypes: [],
+          typeAndUnit: {
+            type: [],
+            unit: []
+          },
+          topAn: [],
+          an: [],
+          nowContent: "",
+          nowTitle: "",
+          nowId: 0,
+          page: 1,
+          loadByDesign: false
+        },
+        mounted: function(){
+          $.getJSON("http://127.0.0.1:8888/api/getInfo",
+            function(data){
+              console.log(data);
+              app2.typeAndUnit.type = data.content.type;
+              app2.typeAndUnit.unit = data.content.unit;
+          });
+          $.getJSON("http://127.0.0.1:8888/api/top",
+            function(data){
+              app2.topAn = data.content;
+          });
+          $.getJSON("http://127.0.0.1:8888/api?page=1",
+            function(data){
+              app2.an = data.content;
+          });
+          this.bottomTest();
+        },
+        methods: {
+          clickTr: function(m, t, id){
+            this.nowContent = m;
+            this.nowTitle = t;
+            this.nowId = id;
+            $.ajax({
+              url: 'http://127.0.0.1:8888/api/coa?ca=c&&id='+id,
+              type: 'get',
+              success: function(res){
+                 console.log(res);
+              }
+            });
+            this.an.forEach(function(v, i){
+              if(v.id == id){
+                v.click = v.click + 1;
+              }
+            });
+            this.topAn.forEach(function(v, i){
+              if(v.id == id){
+                v.click = v.click + 1;
+              }
+            });
+            $("#content_modal").modal("show");
+          },
+          bottomTest: function(){
+            $(window).scroll(function(){
+              var scrollPos = $(document).scrollTop(); //滚动条距离顶部的高度
+              var windowHeight = $(window).height(); //窗口的高度
+              var dbHiht = $(document).height(); //整个页面文件的高度
+              if(dbHiht - windowHeight <= scrollPos){
+                // do what your want because of this is buttom
+                app2.page = app2.page + 1;
+                console.log(app2.page);
+                if(app2.loadByDesign){
+                  $.ajax({
+                    url: 'http://127.0.0.1:8888/api/article',
+                    type: 'post',
+                    data: {
+                      'type[]': app2.checkedTypes,
+                      'unit[]': app2.checkedUnits,
+                      'page': app2.page
+                    },
+                    success: function(res){
+                      console.log(res);
+                      app2.an = app2.an.concat(res.content);
+                    }
+                  });
+                }else{
+                  $.getJSON("http://127.0.0.1:8888/api?page=" + app2.page,
+                    function(data){
+                      console.log(data);
+                      app2.an = app2.an.concat(data.content);
+                  });
+                }
+              }
+            })
+          },
+          saveAndReload: function(){
+            app2.an = [];
+            page = 1;
+            if(app2.checkedTypes.length + app2.checkedUnits.length > 0){
+              app2.loadByDesign = true;
+            } else {
+              app2.loadByDesign = false;
+            }
+            if(app2.loadByDesign){
+              $.ajax({
+                url: 'http://127.0.0.1:8888/api/article',
+                type: 'post',
+                data: {
+                  'type[]': app2.checkedTypes,
+                  'unit[]': app2.checkedUnits,
+                  'page': app2.page
+                },
+                success: function(res){
+                   app2.an = res.content;
+                   console.log(res);
+                }
+              });
+            } else {
+              $.getJSON("http://127.0.0.1:8888/api?page=1",
+                function(data){
+                  console.log(data);
+                  app2.an = data.content;
+              });
+            }
+            $('#choiceModal').modal('hide')
+          },
+          pointApprove: function(){
+            let id = app2.nowId;
+            $.ajax({
+              url: 'http://127.0.0.1:8888/api/coa?ca=a&&id='+id,
+              type: 'get',
+              success: function(res){
+                 console.log(res);
+              }
+            });
+            this.an.forEach(function(v, i){
+              if(v.id == id){
+                v.approve = v.approve + 1;
+              }
+            });
+            this.topAn.forEach(function(v, i){
+              if(v.id == id){
+                v.approve = v.approve + 1;
+              }
+            });
+        }
+
+        }
+      });
+    </script>
+  </body>
+</html>
